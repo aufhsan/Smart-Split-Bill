@@ -32,9 +32,9 @@ export default function AppLayout({onSignOut}: Props) {
   const hideBottomNav = pathname === '/baru'
   const scanActive = pathname === '/scan' || pathname === '/verifikasi'
 
-  return <div className="min-h-screen w-full overflow-x-hidden">
+  return <div className="min-h-screen w-full overflow-x-clip">
     {/* Navbar atas (md+): brand di kiri. Tablet: + menu (Dashboard, Riwayat, Profil), aksi cepat, Keluar. Desktop: menu & aksi ada di sidebar. */}
-    <header className="hidden md:block sticky top-0 z-40 h-14 border-b border-slate-200 bg-white">
+    <header className="hidden md:block fixed inset-x-0 top-0 z-40 h-14 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-2 px-4 sm:px-6 lg:max-w-none">
         <Link to="/" className="min-w-0 truncate text-lg font-extrabold tracking-tight text-brand">Smart Split Bill</Link>
         <nav aria-label="Menu utama" className="ml-2 flex items-center gap-1 lg:hidden">
@@ -72,7 +72,7 @@ export default function AppLayout({onSignOut}: Props) {
     </aside>
 
     {/* Konten: pb-24 di mobile agar tidak tertutup bottom nav */}
-    <div className="min-w-0 pb-24 md:pb-0 lg:pl-64">
+    <div className="min-w-0 pb-24 md:pb-0 md:pt-14 lg:pl-64">
       <div className="mx-auto w-full min-w-0 max-w-7xl"><Outlet/></div>
     </div>
 
