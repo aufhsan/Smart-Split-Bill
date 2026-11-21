@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from 'react'
-import type {MouseEvent} from 'react'
+import type {CSSProperties,MouseEvent} from 'react'
 import {supabase} from '../lib/supabase'
 import {rp} from '../lib/format'
 import {confirmDelete,deleteTransaction} from '../lib/tx'
@@ -15,6 +15,11 @@ const FILTERS:[Filter,string][] = [['semua','Semua'],['belum','Belum Lunas'],['l
 const monthLabel = new Intl.DateTimeFormat('id-ID', {month:'long', year:'numeric', timeZone:'Asia/Jakarta'})
 const monthKey = (ms:number) => new Date(ms + 7*3600e3).toISOString().slice(0,7)      // bulan menurut WIB (UTC+7, tanpa DST)
 const field = 'min-h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'
+// Select dengan panah sendiri: panah bawaan browser menempel di tepi kanan tanpa jarak.
+const sel = field + ' appearance-none pr-10'
+const chevron: CSSProperties = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.25rem'}
 
 export default function Riwayat() {
   const [rows,setRows] = useState<Tx[]|null>(null), [deleting,setDeleting] = useState<string|null>(null), [err,setErr] = useState('')
@@ -64,9 +69,9 @@ export default function Riwayat() {
       <div className="flex flex-col gap-2 md:flex-row md:items-center">
         <input type="search" className={field+' min-w-0 flex-1'} placeholder="Cari nama tempat…" aria-label="Cari nama tempat" value={query} onChange={e=>setQuery(e.target.value)}/>
         <div className="flex gap-2">
-          <select className={field+' min-w-0 flex-1 md:flex-none'} aria-label="Status" value={filter} disabled={!settle} onChange={e=>setFilter(e.target.value as Filter)}>
+          <select style={chevron} className={sel+' min-w-0 flex-1 md:flex-none'} aria-label="Status" value={filter} disabled={!settle} onChange={e=>setFilter(e.target.value as Filter)}>
             {FILTERS.map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select>
-          <select className={field+' min-w-0 flex-1 md:flex-none'} aria-label="Urutkan" value={sort} onChange={e=>setSort(e.target.value as SortKey)}>
+          <select style={chevron} className={sel+' min-w-0 flex-1 md:flex-none'} aria-label="Urutkan" value={sort} onChange={e=>setSort(e.target.value as SortKey)}>
             {SORTS.map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></div></div>
       {groups.length===0 && <p className="text-sm text-slate-600">Tidak ada transaksi yang cocok.{' '}
         <button onClick={()=>{setQuery(''); setFilter('semua')}} className="min-h-11 text-brand underline">Reset pencarian dan filter</button></p>}
