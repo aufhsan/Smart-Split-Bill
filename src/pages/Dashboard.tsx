@@ -3,7 +3,6 @@ import type {MouseEvent,ReactNode} from 'react'
 import {Link} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
 import {rp,txDate} from '../lib/format'
-import {clearAll} from '../lib/draft'
 import {compute,payStatus} from '../lib/calc'
 import type {Kind} from '../lib/calc'
 import {confirmDelete,deleteTransaction} from '../lib/tx'
@@ -122,12 +121,9 @@ export default function Dashboard() {
   const loading = rows === null
   const settleVal = (v:ReactNode) => settleErr ? '—' : settle ? v : '…'
   return <main className="min-w-0 space-y-6 p-4 sm:p-6 lg:p-8">
-    <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <header>
       <div className="min-w-0"><h1 className="text-2xl font-extrabold tracking-tight truncate">{greeting()} 👋</h1>
-        <p className="text-sm text-slate-600">Ringkasan patungan dan pembayaran Anda.</p></div>
-      <div className="flex gap-2">
-        <Link to="/scan" onClick={clearAll} className="flex-1 sm:flex-none whitespace-nowrap text-center rounded-xl bg-brand hover:bg-brand-dark text-white font-bold px-4 py-2.5">+ Scan Struk</Link>
-        <Link to="/baru" onClick={clearAll} className="flex-1 sm:flex-none whitespace-nowrap text-center rounded-xl border border-brand text-brand font-bold px-4 py-2.5">Isi Manual</Link></div></header>
+        <p className="text-sm text-slate-600">Ringkasan patungan dan pembayaran Anda.</p></div></header>
 
     <section aria-label="Ringkasan" className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
       <SummaryCard label="Total Pengeluaran" value={loading ? '…' : rp(stats.total)} hint={loading ? ' ' : `Bulan ini: ${rp(stats.month)}`}/>

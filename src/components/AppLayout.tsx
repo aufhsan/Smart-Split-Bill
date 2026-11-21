@@ -50,18 +50,18 @@ export default function AppLayout({onSignOut}: Props) {
         <IconOut className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Keluar</span></button>
     </aside>
 
-    {/* Tablet (md sampai < lg): top navbar ringkas + aksi cepat */}
-    <header className="hidden md:block lg:hidden sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="flex h-14 items-center gap-2 px-4">
-        <p className="min-w-0 truncate font-extrabold tracking-tight text-brand">Smart Split Bill</p>
-        <nav aria-label="Menu utama" className="ml-2 flex items-center gap-1">
+    {/* Tablet & Desktop (md+): top bar dengan tombol aksi cepat. Di tablet memuat juga brand, menu, dan Keluar; di desktop menu ada di sidebar. */}
+    <header className="hidden md:block sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur lg:pl-64">
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-2 px-4 sm:px-6 lg:px-8">
+        <p className="min-w-0 truncate font-extrabold tracking-tight text-brand lg:hidden">Smart Split Bill</p>
+        <nav aria-label="Menu utama" className="ml-2 flex items-center gap-1 lg:hidden">
           {NAV.map(i => <Link key={i.label} to={i.to} aria-current={i.active(pathname) ? 'page' : undefined}
             className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${i.active(pathname) ? on : off}`}>{i.label}</Link>)}
         </nav>
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <Link to="/baru" onClick={clearAll} className="rounded-lg border border-brand px-3 py-1.5 text-sm font-bold text-brand">Isi manual</Link>
-          <Link to="/scan" onClick={clearAll} className="rounded-lg bg-brand px-3 py-1.5 text-sm font-bold text-white hover:bg-brand-dark">Scan Struk</Link>
-          <button type="button" onClick={onSignOut} className="rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Keluar</button>
+          <Link to="/scan" onClick={clearAll} className="whitespace-nowrap rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
+          <Link to="/baru" onClick={clearAll} className="whitespace-nowrap rounded-lg border border-brand px-3 py-2 text-sm font-bold text-brand hover:bg-brand/5">Isi Manual</Link>
+          <button type="button" onClick={onSignOut} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 lg:hidden">Keluar</button>
         </div>
       </div>
     </header>
