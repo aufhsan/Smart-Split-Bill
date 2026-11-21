@@ -8,6 +8,7 @@ import Editor from './pages/Editor'
 import Detail from './pages/Detail'
 import Scan from './pages/Scan'
 import Verify from './pages/Verify'
+import AppLayout from './components/AppLayout'
 export default function App() {
   const [session,setSession] = useState<Session|null|undefined>(undefined)
   useEffect(() => {
@@ -16,14 +17,15 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
   if (session === undefined) return <p className="p-6">Memuat…</p>
-  const guard = (el:JSX.Element) => session ? el : <Navigate to="/masuk" replace/>
   return <Routes>
     <Route path="/masuk" element={session ? <Navigate to="/" replace/> : <Login/>}/>
-    <Route path="/" element={guard(<Dashboard/>)}/>
-    <Route path="/baru" element={guard(<Editor/>)}/>
-    <Route path="/transaksi/:id" element={guard(<Detail/>)}/>
-    <Route path="/scan" element={guard(<Scan/>)}/>
-    <Route path="/verifikasi" element={guard(<Verify/>)}/>
+    <Route element={session ? <AppLayout onSignOut={() => { void supabase.auth.signOut() }}/> : <Navigate to="/masuk" replace/>}>
+      <Route path="/" element={<Dashboard/>}/>
+      <Route path="/baru" element={<Editor/>}/>
+      <Route path="/transaksi/:id" element={<Detail/>}/>
+      <Route path="/scan" element={<Scan/>}/>
+      <Route path="/verifikasi" element={<Verify/>}/>
+    </Route>
     <Route path="*" element={<Navigate to="/" replace/>}/>
   </Routes>
 }

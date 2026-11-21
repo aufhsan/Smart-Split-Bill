@@ -5,6 +5,7 @@ import {supabase} from '../lib/supabase'
 import {compressImage,toBase64} from '../lib/image'
 import {saveOcr} from '../lib/draft'
 
+const back = 'inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline'
 type Problem = {msg:string; detail?:string}
 /** Ambil isi JSON error asli dari Edge Function (supabase-js hanya memberi pesan generik). */
 async function explain(e:unknown): Promise<Problem> {
@@ -42,19 +43,20 @@ export default function Scan() {
       saveOcr({receiptPath:p, ocr:data}); nav('/verifikasi')
     } catch (e) { setErr(await explain(e)); setStep('') }
   }
-  const btn = 'flex-1 text-center cursor-pointer rounded-xl border border-brand text-brand font-bold py-3'
-  return <main className="max-w-xl mx-auto p-4 sm:p-6 space-y-5">
-    <Link to="/" className="text-sm text-brand underline">← Kembali</Link>
-    <h1 className="text-2xl font-extrabold tracking-tight">Scan struk</h1>
-    <div className="flex flex-col sm:flex-row gap-3">
+  const btn = 'flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-xl border border-brand px-4 py-3 text-center font-bold text-brand hover:bg-brand/5 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand'
+  return <main className="mx-auto w-full min-w-0 max-w-3xl space-y-5 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-1"><Link to="/" className={back}>← Kembali</Link>
+      <h1 className="text-2xl font-extrabold tracking-tight">Scan struk</h1>
+      <p className="text-sm text-slate-600">Foto struk akan dibaca otomatis, lalu Anda bisa memeriksa hasilnya sebelum disimpan.</p></div>
+    <div className="flex flex-col gap-3 sm:flex-row">
       <label className={btn}>Ambil foto<input type="file" accept="image/*" capture="environment" className="sr-only" onChange={e=>pick(e.target.files?.[0])}/></label>
       <label className={btn}>Pilih dari galeri<input type="file" accept="image/*" className="sr-only" onChange={e=>pick(e.target.files?.[0])}/></label></div>
-    {preview && <img src={preview} alt="Pratinjau struk" className="max-h-96 w-full object-contain rounded-xl bg-white border border-slate-200"/>}
+    {preview && <img src={preview} alt="Pratinjau struk" className="max-h-96 w-full rounded-xl border border-slate-200 bg-white object-contain lg:max-h-[32rem]"/>}
     {err && <div role="alert" className="space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
-      <p className="text-red-800 text-sm">{err.msg}</p>
-      {err.detail && <details className="text-xs text-slate-600"><summary className="cursor-pointer">Detail teknis</summary><pre className="mt-1 whitespace-pre-wrap break-words">{err.detail}</pre></details>}
+      <p className="break-words text-sm text-red-800">{err.msg}</p>
+      {err.detail && <details className="text-xs text-slate-600"><summary className="cursor-pointer py-2">Detail teknis</summary><pre className="mt-1 whitespace-pre-wrap break-words">{err.detail}</pre></details>}
       <p className="text-xs text-slate-600">Tekan "Baca struk" untuk mencoba lagi (foto tidak diunggah ulang), atau:</p>
-      <button onClick={()=>{saveOcr({receiptPath:path,ocr:null}); nav('/verifikasi')}} className="text-sm underline text-brand">Isi data struk secara manual</button></div>}
-    <button disabled={!file||!!step} onClick={run} className="w-full rounded-xl bg-brand hover:bg-brand-dark text-white font-bold py-3 disabled:opacity-60">{step || 'Baca struk'}</button>
+      <button onClick={()=>{saveOcr({receiptPath:path,ocr:null}); nav('/verifikasi')}} className="min-h-11 text-sm font-semibold text-brand underline">Isi data struk secara manual</button></div>}
+    <button disabled={!file||!!step} onClick={run} className="min-h-12 w-full rounded-xl bg-brand py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">{step || 'Baca struk'}</button>
   </main>
 }

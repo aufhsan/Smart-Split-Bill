@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react'
-import {useNavigate} from 'react-router-dom'
+import {Link,useNavigate} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
 import {alloc,compute,Cost,Item,Kind} from '../lib/calc'
 import {rp,receiptDT} from '../lib/format'
@@ -9,7 +9,11 @@ const uid = () => crypto.randomUUID()
 const QTY = /^\s*(\d{1,2})\s*[x×X]\s+(.+)$/
 const parseQty = (name:string) => { const m = name.match(QTY); return m && Number(m[1]) > 1 ? {qty:Number(m[1]), name:m[2].trim()} : null }
 const num = (v:string) => Math.max(0, Math.round(Number(v)||0))
-const inp = 'rounded-lg border border-slate-300 bg-white px-3 py-2 w-full'
+const inp = 'min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'   // text-base (16px) mencegah auto-zoom di HP
+const back = 'inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline'
+const iconBtn = 'grid h-11 w-11 shrink-0 place-items-center rounded-lg text-xl text-slate-500 hover:bg-slate-100'
+const outBtn = 'min-h-11 rounded-lg border border-brand px-4 py-2 font-bold text-brand hover:bg-brand/5'
+const saveBtn = 'min-h-12 w-full rounded-xl bg-brand py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60'
 const card = 'rounded-xl bg-white border border-slate-200 p-4 space-y-3'
 const KIND:Record<Kind,string> = {tax:'PPN/Pajak', service:'Service', discount:'Diskon', other:'Biaya lain'}
 export default function Editor() {
@@ -63,65 +67,78 @@ export default function Editor() {
     } catch (e:any) { setErr(e.message ?? 'Gagal menyimpan.'); setBusy(false) }
   }
 
-  return <main className="max-w-3xl mx-auto p-4 sm:p-6 space-y-5 pb-32">
-    <h1 className="text-2xl font-extrabold tracking-tight">Transaksi baru</h1>
-    <section className={card}><h2 className="font-bold">Tempat</h2>
-      <input className={inp} placeholder="Nama tempat (opsional)" value={merchant} onChange={e=>setMerchant(e.target.value)}/>
-      <div className="grid grid-cols-2 gap-2"><input className={inp+' min-w-0'} type="date" aria-label="Tanggal transaksi" value={rdate} onChange={e=>setRdate(e.target.value)}/>
-        <input className={inp+' min-w-0'} type="time" aria-label="Waktu transaksi" value={rtime} onChange={e=>setRtime(e.target.value)}/></div>
-      <p className="text-sm">{dt.text && <span className="font-semibold">{dt.text}</span>}{(dr || dt.text) ? (dt.note && <span className="text-slate-500">{dt.text ? ' · ' : ''}{dt.note}</span>) : <span className="text-slate-500">Kosong = memakai waktu saat disimpan.</span>}</p>
-      <input className={inp} inputMode="numeric" placeholder="Total di struk (opsional, untuk pengecekan)" value={receiptTotal} onChange={e=>setReceiptTotal(e.target.value)}/></section>
+  return <main className="min-w-0 space-y-5 p-4 pb-32 sm:p-6 sm:pb-32 lg:p-8 lg:pb-8">
+    <div className="space-y-1"><Link to="/" className={back}>← Kembali</Link>
+      <h1 className="text-2xl font-extrabold tracking-tight">Transaksi baru</h1></div>
 
-    <section className={card}><h2 className="font-bold">Peserta</h2>
-      <div className="flex gap-2"><input className={inp+' min-w-0'} placeholder="Nama peserta" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addPerson()}/>
-        <button onClick={addPerson} className="rounded-lg bg-brand text-white font-bold px-4">Tambah</button></div>
-      <div className="flex flex-wrap gap-2">{people.map(p=><span key={p.id} className="rounded-full bg-paper border border-slate-300 pl-3 pr-1 py-1 text-sm">{p.name}
-        <button aria-label={`Hapus ${p.name}`} className="ml-1 px-2" onClick={()=>setPeople(people.filter(x=>x.id!==p.id))}>×</button></span>)}</div></section>
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
+      <div className="min-w-0 space-y-5 lg:col-span-7">
+        <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <section className={card+' min-w-0'}><h2 className="font-bold">Tempat</h2>
+            <input className={inp} placeholder="Nama tempat (opsional)" value={merchant} onChange={e=>setMerchant(e.target.value)}/>
+            <div className="grid grid-cols-2 gap-2"><input className={inp+' min-w-0'} type="date" aria-label="Tanggal transaksi" value={rdate} onChange={e=>setRdate(e.target.value)}/>
+              <input className={inp+' min-w-0'} type="time" aria-label="Waktu transaksi" value={rtime} onChange={e=>setRtime(e.target.value)}/></div>
+            <p className="text-sm">{dt.text && <span className="font-semibold">{dt.text}</span>}{(dr || dt.text) ? (dt.note && <span className="text-slate-500">{dt.text ? ' · ' : ''}{dt.note}</span>) : <span className="text-slate-500">Kosong = memakai waktu saat disimpan.</span>}</p>
+            <input className={inp} inputMode="numeric" placeholder="Total di struk (opsional, untuk pengecekan)" value={receiptTotal} onChange={e=>setReceiptTotal(e.target.value)}/></section>
 
-    <section className={card}><h2 className="font-bold">Menu dan pembagiannya</h2>
-      {items.map(it => <div key={it.id} className="rounded-lg border border-slate-200 p-3 space-y-2">
-        <div className="flex flex-wrap gap-2"><input className={inp+' min-w-0 flex-1 basis-44'} placeholder="Nama menu" value={it.name} onChange={e=>patchItem(it.id,{name:e.target.value})}/>
-          <input className={inp+' min-w-0 flex-1 basis-32 sm:flex-none sm:w-40'} inputMode="numeric" placeholder="Harga total" value={it.total||''} onChange={e=>patchItem(it.id,{total:num(e.target.value)})}/>
-          {parseQty(it.name) && <button aria-label={`Pecah menjadi ${parseQty(it.name)!.qty} item satuan`} onClick={()=>splitItem(it.id)} className="rounded-lg border border-brand text-brand text-xs font-bold px-2">Pecah</button>}
-          <button aria-label="Hapus menu" onClick={()=>setItems(items.filter(x=>x.id!==it.id))} className="px-2">×</button></div>
-        <p className="text-xs text-slate-500">Pilih siapa yang ikut. Lebih dari satu orang = dibagi rata.</p>
-        {people.length===0 ? <p className="text-xs text-slate-500">Tambahkan peserta dulu.</p> :
-        <div className="flex flex-wrap items-center gap-2">
-          {people.map(p => { const on = isOn(it.id,p.id)
-            return <button key={p.id} type="button" role="checkbox" aria-checked={on} onClick={()=>toggle(it.id,p.id)}
-              className={`min-h-10 max-w-[11rem] truncate rounded-full border px-3 text-sm font-semibold ${on ? 'bg-brand border-brand text-white' : 'bg-white border-slate-300 text-ink'}`}>{on ? '✓ ' : ''}{p.name}</button> })}
-          {people.length>2 && <button type="button" onClick={()=>toggleAll(it.id)} className="min-h-10 rounded-full px-3 text-sm font-bold text-brand underline">{allOn(it.id) ? 'Kosongkan' : 'Semua'}</button>}</div>}
-        {res.unassigned.includes(it.id) && <p className="text-xs text-amber-700">Belum dibagikan ke siapa pun.</p>}</div>)}
-      <button onClick={()=>setItems([...items,{id:uid(),name:'',total:0}])} className="rounded-lg border border-brand text-brand font-bold px-4 py-2">+ Tambah menu</button></section>
+          <section className={card+' min-w-0'}><h2 className="font-bold">Peserta</h2>
+            <div className="flex gap-2"><input className={inp+' min-w-0'} placeholder="Nama peserta" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addPerson()}/>
+              <button onClick={addPerson} className="min-h-11 shrink-0 rounded-lg bg-brand px-4 font-bold text-white hover:bg-brand-dark">Tambah</button></div>
+            <div className="flex flex-wrap gap-2">{people.map(p=><span key={p.id} className="inline-flex min-h-11 max-w-full items-center rounded-full border border-slate-300 bg-paper pl-3 text-sm"><span className="min-w-0 truncate">{p.name}</span>
+              <button aria-label={`Hapus ${p.name}`} className="grid h-11 w-11 shrink-0 place-items-center rounded-full" onClick={()=>setPeople(people.filter(x=>x.id!==p.id))}>×</button></span>)}</div></section>
+        </div>
 
-    <section className={card}><h2 className="font-bold">Pajak, service, diskon, biaya lain</h2>
-      {costs.map(c => <div key={c.id} className="rounded-lg border border-slate-200 p-3 space-y-2">
-        <div className="flex gap-2"><input className={inp} value={c.name} onChange={e=>patchCost(c.id,{name:e.target.value})}/>
-          <button aria-label="Hapus biaya" onClick={()=>setCosts(costs.filter(x=>x.id!==c.id))} className="px-2">×</button></div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input className={inp} inputMode="decimal" placeholder="Persen %" value={c.percent??''} onChange={e=>patchCost(c.id,{percent:e.target.value===''?null:Number(e.target.value)})}/>
-          <input className={inp} inputMode="numeric" placeholder="Nominal struk" value={c.amount??''} onChange={e=>patchCost(c.id,{amount:e.target.value===''?null:num(e.target.value)})}/>
-          <select className={inp} value={c.method} onChange={e=>patchCost(c.id,{method:e.target.value as Cost['method']})}>
-            <option value="proportional">Proporsional</option><option value="equal">Rata</option></select></div>
-        {(() => { const r = res.costRows.find(x=>x.id===c.id); return r && r.diff!==0 &&
-          <p className="text-xs text-amber-700">Nominal struk {rp(c.amount!)} berbeda {rp(r.diff)} dari hasil persentase ({rp(r.byPercent!)}). Nominal struk dipakai.</p> })()}</div>)}
-      <div className="flex flex-wrap gap-2">{(Object.keys(KIND) as Kind[]).map(k=>
-        <button key={k} onClick={()=>addCost(k)} className="rounded-lg border border-brand text-brand font-bold px-3 py-2 text-sm">+ {KIND[k]}</button>)}</div></section>
+        <section className={card}><h2 className="font-bold">Menu dan pembagiannya</h2>
+          {items.map(it => <div key={it.id} className="space-y-2 rounded-lg border border-slate-200 p-3">
+            <div className="flex flex-wrap gap-2"><input className={inp+' min-w-0 flex-1 basis-44'} placeholder="Nama menu" value={it.name} onChange={e=>patchItem(it.id,{name:e.target.value})}/>
+              <input className={inp+' min-w-0 flex-1 basis-32 sm:w-40 sm:flex-none'} inputMode="numeric" placeholder="Harga total" value={it.total||''} onChange={e=>patchItem(it.id,{total:num(e.target.value)})}/>
+              {parseQty(it.name) && <button aria-label={`Pecah menjadi ${parseQty(it.name)!.qty} item satuan`} onClick={()=>splitItem(it.id)} className="min-h-11 rounded-lg border border-brand px-3 text-xs font-bold text-brand">Pecah</button>}
+              <button aria-label="Hapus menu" onClick={()=>setItems(items.filter(x=>x.id!==it.id))} className={iconBtn}>×</button></div>
+            <p className="text-xs text-slate-500">Pilih siapa yang ikut. Lebih dari satu orang = dibagi rata.</p>
+            {people.length===0 ? <p className="text-xs text-slate-500">Tambahkan peserta dulu.</p> :
+            <div className="flex flex-wrap items-center gap-2">
+              {people.map(p => { const on = isOn(it.id,p.id)
+                return <button key={p.id} type="button" role="checkbox" aria-checked={on} onClick={()=>toggle(it.id,p.id)}
+                  className={`min-h-11 max-w-[11rem] truncate rounded-full border px-4 text-sm font-semibold ${on ? 'border-brand bg-brand text-white' : 'border-slate-300 bg-white text-ink'}`}>{on ? '✓ ' : ''}{p.name}</button> })}
+              {people.length>2 && <button type="button" onClick={()=>toggleAll(it.id)} className="min-h-11 rounded-full px-3 text-sm font-bold text-brand underline">{allOn(it.id) ? 'Kosongkan' : 'Semua'}</button>}</div>}
+            {res.unassigned.includes(it.id) && <p className="text-xs text-amber-700">Belum dibagikan ke siapa pun.</p>}</div>)}
+          <button onClick={()=>setItems([...items,{id:uid(),name:'',total:0}])} className={outBtn}>+ Tambah menu</button></section>
 
-    <section className={card}><h2 className="font-bold">Rincian per orang</h2>
-      {people.length===0 && <p className="text-slate-500 text-sm">Tambahkan peserta untuk melihat hitungan.</p>}
-      {res.persons.map(p => <div key={p.pid} className="rounded-lg bg-paper p-3 text-sm space-y-1">
-        <div className="flex justify-between font-bold text-base"><span className="truncate">{nm(p.pid)}</span><span className="tabular-nums">{rp(p.total)}</span></div>
-        <div className="flex justify-between"><span>Subtotal menu</span><span className="tabular-nums">{rp(p.subtotal)}</span></div>
-        {costs.map(c => <div key={c.id} className="flex justify-between gap-3 text-slate-600">
-          <span>{c.kind==='discount'?'−':'+'} {c.name} <em className="not-italic text-xs">({c.percent!=null&&c.amount==null?`${c.percent}% dari `:''}{c.method==='equal'?'dibagi rata':'proporsional subtotal'})</em></span>
-          <span className="tabular-nums">{rp(p.parts[c.id]??0)}</span></div>)}</div>)}
-      <div className="flex justify-between font-extrabold text-lg"><span>Total semua peserta</span><span className="tabular-nums">{rp(res.grand)}</span></div>
-      {res.reconDiff!==null && <p role="status" className={res.reconDiff===0?'text-brand text-sm':'text-red-700 text-sm'}>
-        {res.reconDiff===0 ? 'Total cocok dengan struk.' : `Selisih dengan total struk: ${rp(res.reconDiff)}. Periksa harga atau biaya.`}</p>}</section>
+        <section className={card}><h2 className="font-bold">Pajak, service, diskon, biaya lain</h2>
+          {costs.map(c => <div key={c.id} className="space-y-2 rounded-lg border border-slate-200 p-3">
+            <div className="flex gap-2"><input className={inp+' min-w-0'} value={c.name} onChange={e=>patchCost(c.id,{name:e.target.value})}/>
+              <button aria-label="Hapus biaya" onClick={()=>setCosts(costs.filter(x=>x.id!==c.id))} className={iconBtn}>×</button></div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              <input className={inp+' min-w-0'} inputMode="decimal" placeholder="Persen %" value={c.percent??''} onChange={e=>patchCost(c.id,{percent:e.target.value===''?null:Number(e.target.value)})}/>
+              <input className={inp+' min-w-0'} inputMode="numeric" placeholder="Nominal struk" value={c.amount??''} onChange={e=>patchCost(c.id,{amount:e.target.value===''?null:num(e.target.value)})}/>
+              <select className={inp+' min-w-0'} value={c.method} onChange={e=>patchCost(c.id,{method:e.target.value as Cost['method']})}>
+                <option value="proportional">Proporsional</option><option value="equal">Rata</option></select></div>
+            {(() => { const r = res.costRows.find(x=>x.id===c.id); return r && r.diff!==0 &&
+              <p className="text-xs text-amber-700">Nominal struk {rp(c.amount!)} berbeda {rp(r.diff)} dari hasil persentase ({rp(r.byPercent!)}). Nominal struk dipakai.</p> })()}</div>)}
+          <div className="flex flex-wrap gap-2">{(Object.keys(KIND) as Kind[]).map(k=>
+            <button key={k} onClick={()=>addCost(k)} className="min-h-11 rounded-lg border border-brand px-3 py-2 text-sm font-bold text-brand hover:bg-brand/5">+ {KIND[k]}</button>)}</div></section>
+      </div>
 
-    {err && <p role="alert" className="text-red-700">{err}</p>}
-    <div className="fixed bottom-0 inset-x-0 bg-white/95 border-t border-slate-200 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><div className="max-w-2xl mx-auto">
-      <button disabled={busy} onClick={save} className="w-full rounded-xl bg-brand hover:bg-brand-dark text-white font-bold py-3 disabled:opacity-60">{busy?'Menyimpan…':'Simpan transaksi'}</button></div></div>
+      {/* Kolom kanan (desktop): ringkasan per peserta + tombol simpan, menempel saat scroll */}
+      <aside className="min-w-0 space-y-3 lg:sticky lg:top-6 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-3rem)] lg:flex-col">
+        <section className={card+' lg:min-h-0 lg:overflow-y-auto'}><h2 className="font-bold">Rincian per orang</h2>
+          {people.length===0 && <p className="text-sm text-slate-500">Tambahkan peserta untuk melihat hitungan.</p>}
+          {res.persons.map(p => <div key={p.pid} className="space-y-1 rounded-lg bg-paper p-3 text-sm">
+            <div className="flex justify-between gap-3 text-base font-bold"><span className="min-w-0 truncate">{nm(p.pid)}</span><span className="shrink-0 tabular-nums">{rp(p.total)}</span></div>
+            <div className="flex justify-between gap-3"><span>Subtotal menu</span><span className="tabular-nums">{rp(p.subtotal)}</span></div>
+            {costs.map(c => <div key={c.id} className="flex justify-between gap-3 text-slate-600">
+              <span className="min-w-0">{c.kind==='discount'?'−':'+'} {c.name} <em className="text-xs not-italic">({c.percent!=null&&c.amount==null?`${c.percent}% dari `:''}{c.method==='equal'?'dibagi rata':'proporsional subtotal'})</em></span>
+              <span className="shrink-0 tabular-nums">{rp(p.parts[c.id]??0)}</span></div>)}</div>)}
+          <div className="flex justify-between gap-3 text-lg font-extrabold"><span>Total semua peserta</span><span className="shrink-0 tabular-nums">{rp(res.grand)}</span></div>
+          {res.reconDiff!==null && <p role="status" className={res.reconDiff===0?'text-sm text-brand':'text-sm text-red-700'}>
+            {res.reconDiff===0 ? 'Total cocok dengan struk.' : `Selisih dengan total struk: ${rp(res.reconDiff)}. Periksa harga atau biaya.`}</p>}</section>
+        {err && <p role="alert" className="text-red-700">{err}</p>}
+        <button disabled={busy} onClick={save} className={saveBtn+' hidden lg:block lg:shrink-0'}>{busy?'Menyimpan…':'Simpan transaksi'}</button>
+      </aside>
+    </div>
+
+    {/* Mobile & tablet: bar simpan menempel di bawah (bottom nav disembunyikan di halaman ini) */}
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"><div className="mx-auto max-w-2xl">
+      <button disabled={busy} onClick={save} className={saveBtn}>{busy?'Menyimpan…':'Simpan transaksi'}</button></div></div>
   </main>
 }
