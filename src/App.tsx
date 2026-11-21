@@ -5,6 +5,7 @@ import {supabase} from './lib/supabase'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Riwayat from './pages/Riwayat'
+import Profile from './pages/Profile'
 import Editor from './pages/Editor'
 import Detail from './pages/Detail'
 import Scan from './pages/Scan'
@@ -17,12 +18,14 @@ export default function App() {
     const {data:{subscription}} = supabase.auth.onAuthStateChange((_e,s) => setSession(s))
     return () => subscription.unsubscribe()
   }, [])
+  const signOut = () => { void supabase.auth.signOut() }
   if (session === undefined) return <p className="p-6">Memuat…</p>
   return <Routes>
     <Route path="/masuk" element={session ? <Navigate to="/" replace/> : <Login/>}/>
-    <Route element={session ? <AppLayout onSignOut={() => { void supabase.auth.signOut() }}/> : <Navigate to="/masuk" replace/>}>
+    <Route element={session ? <AppLayout onSignOut={signOut}/> : <Navigate to="/masuk" replace/>}>
       <Route path="/" element={<Dashboard/>}/>
       <Route path="/riwayat" element={<Riwayat/>}/>
+      <Route path="/profil" element={<Profile onSignOut={signOut}/>}/>
       <Route path="/baru" element={<Editor/>}/>
       <Route path="/transaksi/:id" element={<Detail/>}/>
       <Route path="/scan" element={<Scan/>}/>

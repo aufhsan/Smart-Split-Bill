@@ -13,12 +13,14 @@ const IconHome = svg(<path d="M3 11l9-8 9 8M5 10v10h14V10"/>)
 const IconList = svg(<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>)
 const IconScan = svg(<path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3M4 12h16"/>)
 const IconEdit = svg(<path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>)
+const IconUser = svg(<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/>)
 const IconOut = svg(<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>)
 
 // Riwayat = halaman /riwayat (aktif juga di detail transaksi).
 const NAV: Item[] = [
   {to: '/', label: 'Dashboard', icon: IconHome, active: p => p === '/'},
   {to: '/riwayat', label: 'Riwayat', icon: IconList, active: p => p.startsWith('/riwayat') || p.startsWith('/transaksi')},
+  {to: '/profil', label: 'Profil', icon: IconUser, active: p => p.startsWith('/profil')},
 ]
 
 const on = 'bg-brand/10 text-brand'
@@ -31,13 +33,13 @@ export default function AppLayout({onSignOut}: Props) {
   const scanActive = pathname === '/scan' || pathname === '/verifikasi'
 
   return <div className="min-h-screen w-full overflow-x-hidden">
-    {/* Navbar atas (md+): brand di kiri. Tablet: + menu, aksi cepat, Keluar. Desktop: menu & aksi ada di sidebar. */}
+    {/* Navbar atas (md+): brand di kiri. Tablet: + menu (Dashboard, Riwayat, Profil), aksi cepat, Keluar. Desktop: menu & aksi ada di sidebar. */}
     <header className="hidden md:block sticky top-0 z-40 h-14 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-2 px-4 sm:px-6 lg:max-w-none">
         <Link to="/" className="min-w-0 truncate text-lg font-extrabold tracking-tight text-brand">Smart Split Bill</Link>
         <nav aria-label="Menu utama" className="ml-2 flex items-center gap-1 lg:hidden">
           {NAV.map(i => <Link key={i.label} to={i.to} aria-current={i.active(pathname) ? 'page' : undefined}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${i.active(pathname) ? on : off}`}>{i.label}</Link>)}
+            className={`rounded-lg px-2.5 py-1.5 text-sm font-semibold ${i.active(pathname) ? on : off}`}>{i.label}</Link>)}
         </nav>
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:hidden">
           <Link to="/scan" onClick={clearAll} className="whitespace-nowrap rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
@@ -60,6 +62,9 @@ export default function AppLayout({onSignOut}: Props) {
         <Link to="/riwayat" aria-current={NAV[1].active(pathname) ? 'page' : undefined}
           className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${NAV[1].active(pathname) ? on : off}`}>
           <IconList className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Riwayat</span></Link>
+        <Link to="/profil" aria-current={NAV[2].active(pathname) ? 'page' : undefined}
+          className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${NAV[2].active(pathname) ? on : off}`}>
+          <IconUser className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Profil</span></Link>
       </nav>
       <button type="button" onClick={onSignOut}
         className="mt-auto flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-600 hover:bg-slate-100">
@@ -71,7 +76,7 @@ export default function AppLayout({onSignOut}: Props) {
       <div className="mx-auto w-full min-w-0 max-w-7xl"><Outlet/></div>
     </div>
 
-    {/* Mobile (< md): bottom navigation, tombol utama Scan Struk di tengah */}
+    {/* Mobile (< md): bottom navigation, tombol utama Scan Struk di tengah; Keluar ada di halaman Profil */}
     {!hideBottomNav && <nav aria-label="Menu utama" className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]">
       <div className="grid h-16 grid-cols-5 items-center">
         <MobileLink to="/" label="Dashboard" active={pathname === '/'}><IconHome className="h-6 w-6"/></MobileLink>
@@ -80,8 +85,7 @@ export default function AppLayout({onSignOut}: Props) {
           className="mx-auto -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand text-white shadow-lg ring-4 ring-white hover:bg-brand-dark">
           <IconScan className="h-6 w-6"/></Link>
         <MobileLink to="/baru" label="Manual" active={pathname === '/baru'} onClick={clearAll}><IconEdit className="h-6 w-6"/></MobileLink>
-        <button type="button" onClick={onSignOut} className="flex min-w-0 flex-col items-center gap-0.5 px-1 text-slate-600">
-          <IconOut className="h-6 w-6"/><span className="max-w-full min-w-0 truncate text-[11px] font-semibold">Keluar</span></button>
+        <MobileLink to="/profil" label="Profil" active={NAV[2].active(pathname)}><IconUser className="h-6 w-6"/></MobileLink>
       </div>
     </nav>}
   </div>
