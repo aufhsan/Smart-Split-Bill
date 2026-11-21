@@ -18,6 +18,8 @@ total item = harga baris untuk seluruh kuantitas. kind: tax (PPN/pajak/PB1), ser
 percent hanya jika persentase tercetak; amount hanya jika nominal tercetak.
 receipt_date: tanggal transaksi format DD-MM-YYYY (contoh 20-11-2026). receipt_time: waktu transaksi format HH:mm 24 jam (contoh 10:38).
 Pakai tanggal/waktu transaksi (Date/Time/Tgl/Jam); jika hanya waktu cetak yang tercantum, pakai itu. Jika tidak tercantum atau tidak terbaca jelas, WAJIB isi null, jangan mengarang.
+Item hanya untuk produk/menu yang DIBAYAR. ABAIKAN (jangan dimasukkan ke items) semua sub-item, varian, opsi, catatan, atau modifier yang harganya 0 / @0 / kosong, misalnya level es (Normal Ice, Less Ice), level gula (No Sugar, Less Sugar), ukuran cup (Cup Normal, Regular), pilihan ukuran, NO STRAW / tanpa sedotan, alat makan, dan catatan tambahan tanpa harga.
+Jika ada tambahan berbayar (harga > 0, misalnya "+Oat Milk 10.000", extra shot, topping), JANGAN jadikan baris terpisah: gabungkan nilainya ke total item induknya agar jumlah seluruh total item tetap cocok dengan subtotal struk.
 JANGAN mengarang angka. Jika tidak terbaca yakin, isi null dan set uncertain=true (grand_total_uncertain untuk total akhir).`
 
 // Urutan model: GEMINI_MODEL (env, jika ada) -> daftar berikut (nilai kosong dan duplikat disaring).
@@ -28,13 +30,29 @@ const MAX_RETRY = 1                 // percobaan ulang per model (jeda ~1 dtk)
 const PER_CALL_MS = 20_000          // batas waktu satu panggilan ke Gemini
 const DEADLINE_MS = 65_000          // batas total, jauh di bawah batas sumber daya platform (546)
 
-const VERSION = '2026-11-21e'   // tampil di "Detail teknis" agar jelas versi mana yang ter-deploy
+const VERSION = '2026-11-21f'   // tampil di "Detail teknis" agar jelas versi mana yang ter-deploy
 const json = (b:unknown, status=200) => new Response(JSON.stringify(b), {status, headers:{...cors,'content-type':'application/json','x-ocr-version':VERSION}})
 type Attempt = {model:string; status:number; note:string}
 const fail = (status:number, code:string, error:string, detail?:string, attempts?:Attempt[]) => json({v:VERSION, code, error, detail, attempts}, status)
 const sleep = (ms:number) => new Promise(r => setTimeout(r, ms))
 const b64 = (u:Uint8Array) => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s) }
 const errText = async (r:Response) => { const t = await r.text(); try { return JSON.parse(t).error?.message ?? t } catch { return t } }
+
+// Buang item tanpa harga (total 0 / null / negatif): sisa modifier gratis yang lolos dari prompt.
+// Jika total kosong tetapi unit_price terbaca, total dihitung dari unit_price x qty dulu.
+const dropZeroItems = (data:any) => {
+  if (!Array.isArray(data?.items)) return data
+  data.items = data.items.filter((it:any) => {
+    if (!it) return false
+    let t = Number(it.total)
+    if (!Number.isFinite(t) || t <= 0) {
+      const u = Number(it.unit_price), q = Number(it.qty)
+      if (Number.isFinite(u) && u > 0) { t = u * (Number.isFinite(q) && q > 0 ? q : 1); it.total = t }
+    }
+    return Number.isFinite(t) && t > 0
+  })
+  return data
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', {headers:cors})
@@ -68,7 +86,7 @@ Deno.serve(async (req) => {
         if (r.ok) {
           const j = await r.json(); let data:any = null
           try { data = JSON.parse(j.candidates?.[0]?.content?.parts?.[0]?.text) } catch { /* ditangani di bawah */ }
-          if (data?.items) return json(data)
+          if (data?.items) return json(dropZeroItems(data))
           attempts.push({model, status:200, note: j.promptFeedback?.blockReason ? 'diblokir: ' + j.promptFeedback.blockReason : 'respons kosong atau bukan JSON valid'})
           continue outer                                  // model ini tidak menghasilkan data: coba model berikutnya
         }
