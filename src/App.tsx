@@ -4,6 +4,7 @@ import type {Session} from '@supabase/supabase-js'
 import {supabase} from './lib/supabase'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Riwayat from './pages/Riwayat'
 import Editor from './pages/Editor'
 import Detail from './pages/Detail'
 import Scan from './pages/Scan'
@@ -21,6 +22,7 @@ export default function App() {
     <Route path="/masuk" element={session ? <Navigate to="/" replace/> : <Login/>}/>
     <Route element={session ? <AppLayout onSignOut={() => { void supabase.auth.signOut() }}/> : <Navigate to="/masuk" replace/>}>
       <Route path="/" element={<Dashboard/>}/>
+      <Route path="/riwayat" element={<Riwayat/>}/>
       <Route path="/baru" element={<Editor/>}/>
       <Route path="/transaksi/:id" element={<Detail/>}/>
       <Route path="/scan" element={<Scan/>}/>

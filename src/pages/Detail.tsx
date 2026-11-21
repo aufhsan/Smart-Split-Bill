@@ -55,7 +55,7 @@ export default function Detail() {
   const cur = rows.find(r=>r.pid===pid)
   const who = (itemId:string):string[] => d.as.filter((a:any)=>a.item_id===itemId).map((a:any)=>`${name(a.participant_id)}${a.qty>1?` ×${a.qty}`:''}`)
   return <main className="min-w-0 space-y-5 p-4 sm:p-6 lg:p-8">
-    <div className="space-y-1"><Link to="/" className={back}>← Semua transaksi</Link>
+    <div className="space-y-1"><Link to="/riwayat" className={back}>← Semua transaksi</Link>
       <header className="min-w-0"><h1 className="break-words text-2xl font-extrabold tracking-tight">{d.tx.merchant || 'Tanpa nama tempat'}</h1>
         <p className="text-sm text-slate-500">{txDate(d.tx.transacted_at, d.tx.time_known !== false)}{d.tx.time_known === false && ' · waktu tidak tercantum di struk'}</p></header></div>
     <section className="grid grid-cols-2 gap-3 md:grid-cols-4">

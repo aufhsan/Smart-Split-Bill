@@ -15,10 +15,10 @@ const IconScan = svg(<path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a
 const IconEdit = svg(<path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>)
 const IconOut = svg(<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>)
 
-// "Riwayat" = daftar transaksi. Halaman Dashboard sudah menampilkannya, jadi Dashboard aktif di "/" dan Riwayat aktif di detail transaksi.
+// Riwayat = halaman /riwayat (aktif juga di detail transaksi).
 const NAV: Item[] = [
   {to: '/', label: 'Dashboard', icon: IconHome, active: p => p === '/'},
-  {to: '/', label: 'Riwayat', icon: IconList, active: p => p.startsWith('/transaksi')},
+  {to: '/riwayat', label: 'Riwayat', icon: IconList, active: p => p.startsWith('/riwayat') || p.startsWith('/transaksi')},
 ]
 
 const on = 'bg-brand/10 text-brand'
@@ -57,8 +57,8 @@ export default function AppLayout({onSignOut}: Props) {
         <Link to="/" aria-current={pathname === '/' ? 'page' : undefined}
           className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${pathname === '/' ? on : off}`}>
           <IconHome className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Dashboard</span></Link>
-        <Link to="/" aria-current={pathname.startsWith('/transaksi') ? 'page' : undefined}
-          className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${pathname.startsWith('/transaksi') ? on : off}`}>
+        <Link to="/riwayat" aria-current={NAV[1].active(pathname) ? 'page' : undefined}
+          className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${NAV[1].active(pathname) ? on : off}`}>
           <IconList className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Riwayat</span></Link>
       </nav>
       <button type="button" onClick={onSignOut}
@@ -75,7 +75,7 @@ export default function AppLayout({onSignOut}: Props) {
     {!hideBottomNav && <nav aria-label="Menu utama" className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]">
       <div className="grid h-16 grid-cols-5 items-center">
         <MobileLink to="/" label="Dashboard" active={pathname === '/'}><IconHome className="h-6 w-6"/></MobileLink>
-        <MobileLink to="/" label="Riwayat" active={pathname.startsWith('/transaksi')}><IconList className="h-6 w-6"/></MobileLink>
+        <MobileLink to="/riwayat" label="Riwayat" active={NAV[1].active(pathname)}><IconList className="h-6 w-6"/></MobileLink>
         <Link to="/scan" onClick={clearAll} aria-label="Scan Struk" aria-current={scanActive ? 'page' : undefined}
           className="mx-auto -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand text-white shadow-lg ring-4 ring-white hover:bg-brand-dark">
           <IconScan className="h-6 w-6"/></Link>
