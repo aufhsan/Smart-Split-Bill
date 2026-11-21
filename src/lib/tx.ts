@@ -5,7 +5,7 @@ export async function deleteTransaction(id:string) {
   const {data, error} = await supabase.from('transactions').delete().eq('id', id).select('id')
   if (error) throw error
   if (!data?.length) throw new Error('Transaksi tidak ditemukan atau Anda tidak punya akses untuk menghapusnya.')   // RLS menolak diam-diam = 0 baris
-  const paths = (rc ?? []).map(r => r.storage_path)
+  const paths = (rc ?? []).map((r:{storage_path:string}) => r.storage_path)
   if (paths.length) await supabase.storage.from('receipts').remove(paths).catch(() => {})                      // foto gagal terhapus tidak membatalkan hasil
 }
 export const confirmDelete = (name:string|null) =>

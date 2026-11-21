@@ -2,6 +2,8 @@ import {useCallback,useEffect,useMemo,useState} from 'react'
 import {Link,useNavigate,useParams} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
 import {compute,payStatus} from '../lib/calc'
+type Computed = ReturnType<typeof compute>
+type PersonRow = Computed['persons'][number] & ReturnType<typeof payStatus> & {paid:number}
 import {rp,wib,txDate} from '../lib/format'
 import {confirmDelete,deleteTransaction} from '../lib/tx'
 const inp = 'rounded-lg border border-slate-300 bg-white px-3 py-2 w-full min-w-0'
@@ -23,16 +25,16 @@ export default function Detail() {
   const [img,setImg] = useState('')
   useEffect(() => { supabase.from('receipts').select('storage_path').eq('transaction_id',id!).limit(1).then(async ({data}) => {
     const p = data?.[0]?.storage_path; if (p) { const s = await supabase.storage.from('receipts').createSignedUrl(p,3600); setImg(s.data?.signedUrl ?? '') } }) }, [id])
-  const res = useMemo(() => d && compute(d.pa.map((p:any)=>p.id),
+  const res = useMemo<Computed|null>(() => d ? compute(d.pa.map((p:any)=>p.id),
     d.it.map((i:any)=>({id:i.id,name:i.name,total:Number(i.total_price)})),
     d.as.map((a:any)=>({itemId:a.item_id,pid:a.participant_id,qty:a.qty})),
     d.co.map((c:any)=>({id:c.id,kind:c.kind,name:c.name,percent:c.percent==null?null:Number(c.percent),amount:c.printed_amount==null?null:Number(c.printed_amount),method:c.method})),
-    d.tx.receipt_total==null ? null : Number(d.tx.receipt_total)), [d])
+    d.tx.receipt_total==null ? null : Number(d.tx.receipt_total)) : null, [d])
   if (gone) return <p className="p-6" role="alert">Transaksi tidak ditemukan. <Link className="underline" to="/">Kembali</Link></p>
   if (!d || !res) return <p className="p-6">Memuat…</p>
   const name = (x:string) => d.pa.find((p:any)=>p.id===x)?.name ?? ''
   const paidOf = (x:string) => d.py.filter((p:any)=>p.participant_id===x).reduce((s:number,p:any)=>s+Number(p.amount),0)
-  const rows = res.persons.map(p => ({...p, paid:paidOf(p.pid), ...payStatus(p.total, paidOf(p.pid))}))
+  const rows:PersonRow[] = res.persons.map(p => ({...p, paid:paidOf(p.pid), ...payStatus(p.total, paidOf(p.pid))}))
   async function addPay() {
     const amount = Math.round(Number(amt)||0)
     if (!pid || amount<=0) return setErr('Pilih peserta dan isi nominal lebih dari 0.')

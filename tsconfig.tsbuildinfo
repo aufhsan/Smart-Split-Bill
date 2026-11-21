@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/lib/calc.test.ts","./src/lib/calc.ts","./src/lib/draft.ts","./src/lib/format.ts","./src/lib/image.ts","./src/lib/supabase.ts","./src/lib/tx.ts","./src/pages/dashboard.tsx","./src/pages/detail.tsx","./src/pages/editor.tsx","./src/pages/login.tsx","./src/pages/scan.tsx","./src/pages/verify.tsx","./vite.config.ts"],"version":"5.6.3"}
