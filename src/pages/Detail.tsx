@@ -86,7 +86,7 @@ export default function Detail() {
       </div>
 
       {/* Kanan (desktop): tagihan per orang, pembayaran, aksi; menempel saat scroll */}
-      <aside className="min-w-0 space-y-5 lg:sticky lg:top-6 lg:col-span-5 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-1">
+      <aside className="min-w-0 space-y-5 lg:sticky lg:top-20 lg:col-span-5 lg:max-h-[calc(100vh-6.5rem)] lg:overflow-y-auto lg:pr-1">
         <section className="space-y-3"><h2 className="font-bold">Tagihan per orang</h2>
           {rows.map(r => <div key={r.pid} className={card}>
             <div className="flex flex-wrap items-center justify-between gap-2"><p className="min-w-0 truncate font-bold">{name(r.pid)}</p>

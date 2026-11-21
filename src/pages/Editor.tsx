@@ -120,7 +120,7 @@ export default function Editor() {
       </div>
 
       {/* Kolom kanan (desktop): ringkasan per peserta + tombol simpan, menempel saat scroll */}
-      <aside className="min-w-0 space-y-3 lg:sticky lg:top-6 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-3rem)] lg:flex-col">
+      <aside className="min-w-0 space-y-3 lg:sticky lg:top-20 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-6.5rem)] lg:flex-col">
         <section className={card+' lg:min-h-0 lg:overflow-y-auto'}><h2 className="font-bold">Rincian per orang</h2>
           {people.length===0 && <p className="text-sm text-slate-500">Tambahkan peserta untuk melihat hitungan.</p>}
           {res.persons.map(p => <div key={p.pid} className="space-y-1 rounded-lg bg-paper p-3 text-sm">

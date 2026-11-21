@@ -98,7 +98,7 @@ export default function Verify() {
       </div>
 
       {/* Kanan (desktop): foto struk berdampingan, pengecekan total, dan tombol lanjut; menempel saat scroll */}
-      <aside className="min-w-0 space-y-3 lg:sticky lg:top-6 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-3rem)] lg:flex-col">
+      <aside className="min-w-0 space-y-3 lg:sticky lg:top-20 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-6.5rem)] lg:flex-col">
         {img && <section className={card+' hidden lg:block lg:min-h-0 lg:overflow-y-auto'}><h2 className="font-bold">Foto struk</h2>{photo}</section>}
         <section className={card+' lg:shrink-0'}><h2 className="font-bold">Total di struk</h2>
           <input className={inp+warn(gFlag)} inputMode="numeric" value={grand} onChange={e=>{setGrand(e.target.value); setGFlag(false)}} placeholder="Grand total"/>
