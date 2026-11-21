@@ -1,6 +1,7 @@
 import type {ReactNode} from 'react'
 import {Link,Outlet,useLocation} from 'react-router-dom'
 import {clearAll} from '../lib/draft'
+import AmbientBackground from './AmbientBackground'
 
 type Props = {onSignOut: () => void}
 type IconProps = {className?: string}
@@ -24,7 +25,7 @@ const NAV: Item[] = [
 ]
 
 const on = 'bg-brand/10 text-brand'
-const off = 'text-slate-600 hover:bg-slate-100'
+const off = 'text-slate-600 hover:bg-white/60'
 
 export default function AppLayout({onSignOut}: Props) {
   const {pathname} = useLocation()
@@ -32,9 +33,10 @@ export default function AppLayout({onSignOut}: Props) {
   const hideBottomNav = pathname === '/baru'
   const scanActive = pathname === '/scan' || pathname === '/verifikasi'
 
-  return <div className="min-h-screen w-full overflow-x-clip">
+  return <div className="relative isolate min-h-screen w-full overflow-x-clip bg-slate-50/90">
+    <AmbientBackground/>
     {/* Navbar atas (md+): brand di kiri. Tablet: + menu (Dashboard, Riwayat, Profil), aksi cepat, Keluar. Desktop: menu & aksi ada di sidebar. */}
-    <header className="hidden md:block fixed inset-x-0 top-0 z-40 h-14 border-b border-slate-200 bg-white">
+    <header className="hidden md:block fixed inset-x-0 top-0 z-40 h-14 border-b border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-2 px-4 sm:px-6 lg:max-w-none">
         <Link to="/" className="min-w-0 truncate text-lg font-extrabold tracking-tight text-brand">Smart Split Bill</Link>
         <nav aria-label="Menu utama" className="ml-2 flex items-center gap-1 lg:hidden">
@@ -42,20 +44,20 @@ export default function AppLayout({onSignOut}: Props) {
             className={`rounded-lg px-2.5 py-1.5 text-sm font-semibold ${i.active(pathname) ? on : off}`}>{i.label}</Link>)}
         </nav>
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:hidden">
-          <Link to="/scan" onClick={clearAll} className="whitespace-nowrap rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
+          <Link to="/scan" onClick={clearAll} className="whitespace-nowrap rounded-lg bg-brand/90 backdrop-blur-md px-3 py-2 text-sm font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
           <Link to="/baru" onClick={clearAll} className="whitespace-nowrap rounded-lg border border-brand px-3 py-2 text-sm font-bold text-brand hover:bg-brand/5">Isi Manual</Link>
-          <button type="button" onClick={onSignOut} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Keluar</button>
+          <button type="button" onClick={onSignOut} className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-white/60">Keluar</button>
         </div>
       </div>
     </header>
 
     {/* Desktop (lg): sidebar kiri tetap di bawah navbar, berisi tombol aksi + menu + Keluar */}
-    <aside className="hidden lg:flex fixed bottom-0 left-0 top-14 z-30 w-64 flex-col border-r border-slate-200 bg-white p-4">
+    <aside className="hidden lg:flex fixed bottom-0 left-0 top-14 z-30 w-64 flex-col border-r border-white/70 bg-white/65 p-4 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl">
       <div className="space-y-2">
-        <Link to="/scan" onClick={clearAll} className="flex min-h-11 items-center justify-center rounded-xl bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
+        <Link to="/scan" onClick={clearAll} className="flex min-h-11 items-center justify-center rounded-xl bg-brand/90 backdrop-blur-md px-4 py-2.5 font-bold text-white hover:bg-brand-dark">+ Scan Struk</Link>
         <Link to="/baru" onClick={clearAll} className="flex min-h-11 items-center justify-center rounded-xl border border-brand px-4 py-2.5 font-bold text-brand hover:bg-brand/5">Isi Manual</Link>
       </div>
-      <nav aria-label="Menu utama" className="mt-5 flex flex-col gap-1 border-t border-slate-200 pt-4">
+      <nav aria-label="Menu utama" className="mt-5 flex flex-col gap-1 border-t border-white/70 pt-4">
         <Link to="/" aria-current={pathname === '/' ? 'page' : undefined}
           className={`flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold ${pathname === '/' ? on : off}`}>
           <IconHome className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Dashboard</span></Link>
@@ -67,7 +69,7 @@ export default function AppLayout({onSignOut}: Props) {
           <IconUser className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Profil</span></Link>
       </nav>
       <button type="button" onClick={onSignOut}
-        className="mt-auto flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-600 hover:bg-slate-100">
+        className="mt-auto flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-600 hover:bg-white/60">
         <IconOut className="h-5 w-5 shrink-0"/><span className="min-w-0 truncate">Keluar</span></button>
     </aside>
 
@@ -77,12 +79,12 @@ export default function AppLayout({onSignOut}: Props) {
     </div>
 
     {/* Mobile (< md): bottom navigation, tombol utama Scan Struk di tengah; Keluar ada di halaman Profil */}
-    {!hideBottomNav && <nav aria-label="Menu utama" className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]">
+    {!hideBottomNav && <nav aria-label="Menu utama" className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-white/70 bg-white/65 shadow-[0_-8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
       <div className="grid h-16 grid-cols-5 items-center">
         <MobileLink to="/" label="Dashboard" active={pathname === '/'}><IconHome className="h-6 w-6"/></MobileLink>
         <MobileLink to="/riwayat" label="Riwayat" active={NAV[1].active(pathname)}><IconList className="h-6 w-6"/></MobileLink>
         <Link to="/scan" onClick={clearAll} aria-label="Scan Struk" aria-current={scanActive ? 'page' : undefined}
-          className="mx-auto -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand text-white shadow-lg ring-4 ring-white hover:bg-brand-dark">
+          className="mx-auto -mt-6 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand/90 backdrop-blur-md text-white shadow-lg ring-4 ring-white hover:bg-brand-dark">
           <IconScan className="h-6 w-6"/></Link>
         <MobileLink to="/baru" label="Manual" active={pathname === '/baru'} onClick={clearAll}><IconEdit className="h-6 w-6"/></MobileLink>
         <MobileLink to="/profil" label="Profil" active={NAV[2].active(pathname)}><IconUser className="h-6 w-6"/></MobileLink>

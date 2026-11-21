@@ -14,7 +14,7 @@ const SORTS:[SortKey,string][] = [['terbaru','Terbaru'],['terlama','Terlama'],['
 const FILTERS:[Filter,string][] = [['semua','Semua'],['belum','Belum Lunas'],['lunas','Lunas']]
 const monthLabel = new Intl.DateTimeFormat('id-ID', {month:'long', year:'numeric', timeZone:'Asia/Jakarta'})
 const monthKey = (ms:number) => new Date(ms + 7*3600e3).toISOString().slice(0,7)      // bulan menurut WIB (UTC+7, tanpa DST)
-const field = 'min-h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'
+const field = 'min-h-11 rounded-lg px-3 py-2 text-base border border-white/80 bg-white/70 ring-1 ring-slate-300/50 backdrop-blur-md focus:bg-white/95'
 // Select dengan panah sendiri: panah bawaan browser menempel di tepi kanan tanpa jarak.
 const sel = field + ' appearance-none pr-10'
 const chevron: CSSProperties = {
@@ -77,8 +77,8 @@ export default function Riwayat() {
         <button onClick={()=>{setQuery(''); setFilter('semua')}} className="min-h-11 text-brand underline">Reset pencarian dan filter</button></p>}
       {groups.map(g => <section key={g.label} className="space-y-2">
         <div className="flex items-baseline justify-between gap-3 px-1"><h2 className="min-w-0 truncate text-sm font-bold">{g.label}</h2><p className="shrink-0 text-sm tabular-nums text-slate-500">{rp(g.total)}</p></div>
-        <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
-          {g.items.map(t => <li key={t.id} className={`flex items-center ${deleting===t.id ? 'opacity-50' : ''}`}>
+        <ul className="space-y-2">
+          {g.items.map(t => <li key={t.id} className={`flex items-center overflow-hidden rounded-xl border border-white/60 bg-white/50 hover:bg-white/80 ${deleting===t.id ? 'opacity-50' : ''}`}>
             <TxLink t={t} s={settle?.get(t.id)}/>
             <button onClick={e=>remove(e,t)} disabled={!!deleting} aria-label={`Hapus transaksi ${t.merchant || 'tanpa nama tempat'}`} title="Hapus transaksi"
               className="mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-700 disabled:opacity-60">

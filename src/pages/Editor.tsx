@@ -9,12 +9,12 @@ const uid = () => crypto.randomUUID()
 const QTY = /^\s*(\d{1,2})\s*[x×X]\s+(.+)$/
 const parseQty = (name:string) => { const m = name.match(QTY); return m && Number(m[1]) > 1 ? {qty:Number(m[1]), name:m[2].trim()} : null }
 const num = (v:string) => Math.max(0, Math.round(Number(v)||0))
-const inp = 'min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'   // text-base (16px) mencegah auto-zoom di HP
+const inp = 'min-h-11 w-full rounded-lg px-3 py-2 text-base border border-white/80 bg-white/70 ring-1 ring-slate-300/50 backdrop-blur-md focus:bg-white/95'   // text-base (16px) mencegah auto-zoom di HP
 const back = 'inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline'
-const iconBtn = 'grid h-11 w-11 shrink-0 place-items-center rounded-lg text-xl text-slate-500 hover:bg-slate-100'
+const iconBtn = 'grid h-11 w-11 shrink-0 place-items-center rounded-lg text-xl text-slate-500 hover:bg-white/60'
 const outBtn = 'min-h-11 rounded-lg border border-brand px-4 py-2 font-bold text-brand hover:bg-brand/5'
-const saveBtn = 'min-h-12 w-full rounded-xl bg-brand py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60'
-const card = 'rounded-xl bg-white border border-slate-200 p-4 space-y-3'
+const saveBtn = 'min-h-12 w-full rounded-xl bg-brand/90 backdrop-blur-md py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60'
+const card = 'rounded-xl p-4 space-y-3 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl'
 const KIND:Record<Kind,string> = {tax:'PPN/Pajak', service:'Service', discount:'Diskon', other:'Biaya lain'}
 export default function Editor() {
   const nav = useNavigate()
@@ -83,13 +83,13 @@ export default function Editor() {
 
           <section className={card+' min-w-0'}><h2 className="font-bold">Peserta</h2>
             <div className="flex gap-2"><input className={inp+' min-w-0'} placeholder="Nama peserta" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addPerson()}/>
-              <button onClick={addPerson} className="min-h-11 shrink-0 rounded-lg bg-brand px-4 font-bold text-white hover:bg-brand-dark">Tambah</button></div>
-            <div className="flex flex-wrap gap-2">{people.map(p=><span key={p.id} className="inline-flex min-h-11 max-w-full items-center rounded-full border border-slate-300 bg-paper pl-3 text-sm"><span className="min-w-0 truncate">{p.name}</span>
+              <button onClick={addPerson} className="min-h-11 shrink-0 rounded-lg bg-brand/90 backdrop-blur-md px-4 font-bold text-white hover:bg-brand-dark">Tambah</button></div>
+            <div className="flex flex-wrap gap-2">{people.map(p=><span key={p.id} className="inline-flex min-h-11 max-w-full items-center rounded-full border border-white/60 bg-white/50 pl-3 text-sm"><span className="min-w-0 truncate">{p.name}</span>
               <button aria-label={`Hapus ${p.name}`} className="grid h-11 w-11 shrink-0 place-items-center rounded-full" onClick={()=>setPeople(people.filter(x=>x.id!==p.id))}>×</button></span>)}</div></section>
         </div>
 
         <section className={card}><h2 className="font-bold">Menu dan pembagiannya</h2>
-          {items.map(it => <div key={it.id} className="space-y-2 rounded-lg border border-slate-200 p-3">
+          {items.map(it => <div key={it.id} className="space-y-2 rounded-lg p-3 border border-white/60 bg-white/50 hover:bg-white/80">
             <div className="flex flex-wrap gap-2"><input className={inp+' min-w-0 flex-1 basis-44'} placeholder="Nama menu" value={it.name} onChange={e=>patchItem(it.id,{name:e.target.value})}/>
               <input className={inp+' min-w-0 flex-1 basis-32 sm:w-40 sm:flex-none'} inputMode="numeric" placeholder="Harga total" value={it.total||''} onChange={e=>patchItem(it.id,{total:num(e.target.value)})}/>
               {parseQty(it.name) && <button aria-label={`Pecah menjadi ${parseQty(it.name)!.qty} item satuan`} onClick={()=>splitItem(it.id)} className="min-h-11 rounded-lg border border-brand px-3 text-xs font-bold text-brand">Pecah</button>}
@@ -99,13 +99,13 @@ export default function Editor() {
             <div className="flex flex-wrap items-center gap-2">
               {people.map(p => { const on = isOn(it.id,p.id)
                 return <button key={p.id} type="button" role="checkbox" aria-checked={on} onClick={()=>toggle(it.id,p.id)}
-                  className={`min-h-11 max-w-[11rem] truncate rounded-full border px-4 text-sm font-semibold ${on ? 'border-brand bg-brand text-white' : 'border-slate-300 bg-white text-ink'}`}>{on ? '✓ ' : ''}{p.name}</button> })}
+                  className={`min-h-11 max-w-[11rem] truncate rounded-full border px-4 text-sm font-semibold ${on ? 'border-brand bg-brand/90 backdrop-blur-md text-white' : 'border-white/70 bg-white/60 text-ink hover:bg-white/80'}`}>{on ? '✓ ' : ''}{p.name}</button> })}
               {people.length>2 && <button type="button" onClick={()=>toggleAll(it.id)} className="min-h-11 rounded-full px-3 text-sm font-bold text-brand underline">{allOn(it.id) ? 'Kosongkan' : 'Semua'}</button>}</div>}
             {res.unassigned.includes(it.id) && <p className="text-xs text-amber-700">Belum dibagikan ke siapa pun.</p>}</div>)}
           <button onClick={()=>setItems([...items,{id:uid(),name:'',total:0}])} className={outBtn}>+ Tambah menu</button></section>
 
         <section className={card}><h2 className="font-bold">Pajak, service, diskon, biaya lain</h2>
-          {costs.map(c => <div key={c.id} className="space-y-2 rounded-lg border border-slate-200 p-3">
+          {costs.map(c => <div key={c.id} className="space-y-2 rounded-lg p-3 border border-white/60 bg-white/50 hover:bg-white/80">
             <div className="flex gap-2"><input className={inp+' min-w-0'} value={c.name} onChange={e=>patchCost(c.id,{name:e.target.value})}/>
               <button aria-label="Hapus biaya" onClick={()=>setCosts(costs.filter(x=>x.id!==c.id))} className={iconBtn}>×</button></div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
@@ -123,7 +123,7 @@ export default function Editor() {
       <aside className="min-w-0 space-y-3 lg:sticky lg:top-20 lg:col-span-5 lg:flex lg:max-h-[calc(100vh-6.5rem)] lg:flex-col">
         <section className={card+' lg:min-h-0 lg:overflow-y-auto'}><h2 className="font-bold">Rincian per orang</h2>
           {people.length===0 && <p className="text-sm text-slate-500">Tambahkan peserta untuk melihat hitungan.</p>}
-          {res.persons.map(p => <div key={p.pid} className="space-y-1 rounded-lg bg-paper p-3 text-sm">
+          {res.persons.map(p => <div key={p.pid} className="space-y-1 rounded-lg p-3 text-sm border border-white/60 bg-white/50 hover:bg-white/80">
             <div className="flex justify-between gap-3 text-base font-bold"><span className="min-w-0 truncate">{nm(p.pid)}</span><span className="shrink-0 tabular-nums">{rp(p.total)}</span></div>
             <div className="flex justify-between gap-3"><span>Subtotal menu</span><span className="tabular-nums">{rp(p.subtotal)}</span></div>
             {costs.map(c => <div key={c.id} className="flex justify-between gap-3 text-slate-600">
@@ -138,7 +138,7 @@ export default function Editor() {
     </div>
 
     {/* Mobile & tablet: bar simpan menempel di bawah (bottom nav disembunyikan di halaman ini) */}
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"><div className="mx-auto max-w-2xl">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/70 bg-white/65 shadow-[0_-8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"><div className="mx-auto max-w-2xl">
       <button disabled={busy} onClick={save} className={saveBtn}>{busy?'Menyimpan…':'Simpan transaksi'}</button></div></div>
   </main>
 }

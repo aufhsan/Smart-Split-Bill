@@ -7,12 +7,12 @@ import type {Kind} from '../lib/calc'
 import {rp,receiptDT} from '../lib/format'
 const uid = () => crypto.randomUUID()
 const num = (v:string) => Math.max(0, Math.round(Number(v)||0))
-const inp = 'min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'   // text-base (16px) mencegah auto-zoom di HP
+const inp = 'min-h-11 w-full min-w-0 rounded-lg px-3 py-2 text-base border border-white/80 bg-white/70 ring-1 ring-slate-300/50 backdrop-blur-md focus:bg-white/95'   // text-base (16px) mencegah auto-zoom di HP
 const back = 'inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline'
-const iconBtn = 'grid h-11 w-11 shrink-0 place-items-center rounded-lg text-xl text-slate-500 hover:bg-slate-100'
+const iconBtn = 'grid h-11 w-11 shrink-0 place-items-center rounded-lg text-xl text-slate-500 hover:bg-white/60'
 const outBtn = 'min-h-11 rounded-lg border border-brand px-4 py-2 font-bold text-brand hover:bg-brand/5'
-const nextBtn = 'min-h-12 w-full rounded-xl bg-brand py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60'
-const card = 'rounded-xl bg-white border border-slate-200 p-4 space-y-3'
+const nextBtn = 'min-h-12 w-full rounded-xl bg-brand/90 backdrop-blur-md py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60'
+const card = 'rounded-xl p-4 space-y-3 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl'
 const warn = (f:boolean) => f ? ' !border-amber-400 !bg-amber-50' : ''
 // Awalan jumlah di nama menu: "2x Bakwan", "2 x Bakwan", "2× Bakwan" (qty dari OCR sudah dijadikan awalan "N× " saat dimuat).
 const QTY = /^\s*(\d{1,2})\s*[x×X]\s+(.+)$/
@@ -85,7 +85,7 @@ export default function Verify() {
             {r.flag && ok(r.id, pr)}</div>)}
           <button onClick={()=>setRows([...rows,{id:uid(),name:'',total:0,flag:false}])} className={outBtn}>+ Tambah menu</button></section>
         <section className={card}><h2 className="font-bold">Pajak, service, diskon, biaya lain</h2>
-          {costs.map(c => <div key={c.id} className="space-y-2 rounded-lg border border-slate-200 p-3">
+          {costs.map(c => <div key={c.id} className="space-y-2 rounded-lg p-3 border border-white/60 bg-white/50 hover:bg-white/80">
             <div className="flex gap-2"><select className={inp+' !w-32 shrink-0 sm:!w-36'} value={c.kind} onChange={e=>pc(c.id,{kind:e.target.value as Kind})}>
               <option value="tax">Pajak</option><option value="service">Service</option><option value="discount">Diskon</option><option value="other">Lain</option></select>
               <input className={inp+warn(c.flag)} value={c.name} onChange={e=>pc(c.id,{name:e.target.value})}/>
@@ -112,7 +112,7 @@ export default function Verify() {
     </div>
 
     {/* Mobile: bar di atas bottom nav (h-16 + safe area). Tablet: menempel di dasar layar. Desktop: tombol ada di kolom kanan. */}
-    <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-slate-200 bg-white/95 p-4 md:bottom-0 md:pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"><div className="mx-auto max-w-3xl space-y-1">
+    <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-white/70 bg-white/65 shadow-[0_-8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl p-4 md:bottom-0 md:pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"><div className="mx-auto max-w-3xl space-y-1">
       {flagMsg}
       <button disabled={flags>0||rows.length===0} onClick={next} className={nextBtn}>Lanjut ke pembagian</button></div></div>
   </main>

@@ -51,12 +51,12 @@ export default function Scan() {
     <div className="flex flex-col gap-3 sm:flex-row">
       <label className={btn}>Ambil foto<input type="file" accept="image/*" capture="environment" className="sr-only" onChange={e=>pick(e.target.files?.[0])}/></label>
       <label className={btn}>Pilih dari galeri<input type="file" accept="image/*" className="sr-only" onChange={e=>pick(e.target.files?.[0])}/></label></div>
-    {preview && <img src={preview} alt="Pratinjau struk" className="max-h-96 w-full rounded-xl border border-slate-200 bg-white object-contain lg:max-h-[32rem]"/>}
+    {preview && <img src={preview} alt="Pratinjau struk" className="max-h-96 w-full rounded-xl object-contain border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl lg:max-h-[32rem]"/>}
     {err && <div role="alert" className="space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
       <p className="break-words text-sm text-red-800">{err.msg}</p>
       {err.detail && <details className="text-xs text-slate-600"><summary className="cursor-pointer py-2">Detail teknis</summary><pre className="mt-1 whitespace-pre-wrap break-words">{err.detail}</pre></details>}
       <p className="text-xs text-slate-600">Tekan "Baca struk" untuk mencoba lagi (foto tidak diunggah ulang), atau:</p>
       <button onClick={()=>{saveOcr({receiptPath:path,ocr:null}); nav('/verifikasi')}} className="min-h-11 text-sm font-semibold text-brand underline">Isi data struk secara manual</button></div>}
-    <button disabled={!file||!!step} onClick={run} className="min-h-12 w-full rounded-xl bg-brand py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">{step || 'Baca struk'}</button>
+    <button disabled={!file||!!step} onClick={run} className="min-h-12 w-full rounded-xl bg-brand/90 backdrop-blur-md py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">{step || 'Baca struk'}</button>
   </main>
 }

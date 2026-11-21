@@ -15,7 +15,7 @@ function greeting() {                                                           
   return h >= 4 && h < 11 ? 'Selamat pagi' : h < 15 && h >= 11 ? 'Selamat siang' : h >= 15 && h < 18 ? 'Selamat sore' : 'Selamat malam'
 }
 function SummaryCard({label,value,hint,tone}:{label:string; value:ReactNode; hint:string; tone?:string}) {
-  return <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-4">
+  return <div className="min-w-0 rounded-xl p-4 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl">
     <p className="truncate text-sm font-semibold text-slate-600">{label}</p>
     <p className={`mt-1 truncate text-2xl font-extrabold tabular-nums ${tone ?? ''}`}>{value}</p>
     <p className="mt-1 truncate text-xs text-slate-500">{hint}</p></div>
@@ -62,7 +62,7 @@ export default function Dashboard() {
       : <section className="space-y-3">
         <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-extrabold">Transaksi Terbaru</h2>
           <Link to="/riwayat" className="inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline">Lihat semua →</Link></div>
-        <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
-          {rows.slice(0, RECENT).map(t => <li key={t.id} className="flex"><TxLink t={t} s={settle?.get(t.id)}/></li>)}</ul></section>}
+        <ul className="space-y-2">
+          {rows.slice(0, RECENT).map(t => <li key={t.id} className="flex overflow-hidden rounded-xl border border-white/60 bg-white/50 hover:bg-white/80"><TxLink t={t} s={settle?.get(t.id)}/></li>)}</ul></section>}
   </main>
 }

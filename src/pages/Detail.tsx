@@ -6,10 +6,10 @@ type Computed = ReturnType<typeof compute>
 type PersonRow = Computed['persons'][number] & ReturnType<typeof payStatus> & {paid:number}
 import {rp,wib,txDate} from '../lib/format'
 import {confirmDelete,deleteTransaction} from '../lib/tx'
-const inp = 'min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'   // text-base (16px) mencegah auto-zoom di HP
+const inp = 'min-h-11 w-full min-w-0 rounded-lg px-3 py-2 text-base border border-white/80 bg-white/70 ring-1 ring-slate-300/50 backdrop-blur-md focus:bg-white/95'   // text-base (16px) mencegah auto-zoom di HP
 const back = 'inline-flex min-h-11 items-center text-sm font-semibold text-brand hover:underline'
 
-const card = 'rounded-xl bg-white border border-slate-200 p-4 space-y-3'
+const card = 'rounded-xl p-4 space-y-3 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl'
 const BADGE:Record<string,string> = {'Belum Bayar':'bg-red-100 text-red-800','Dibayar Sebagian':'bg-amber-100 text-amber-900','Lunas':'bg-emerald-100 text-emerald-900'}
 export default function Detail() {
   const {id} = useParams()
@@ -60,7 +60,7 @@ export default function Detail() {
         <p className="text-sm text-slate-500">{txDate(d.tx.transacted_at, d.tx.time_known !== false)}{d.tx.time_known === false && ' · waktu tidak tercantum di struk'}</p></header></div>
     <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {[['Total tagihan',res.grand],['Sudah dibayar',rows.reduce((s,r)=>s+r.paid,0)],['Sisa',rows.reduce((s,r)=>s+r.sisa,0)],['Kelebihan bayar',rows.reduce((s,r)=>s+r.lebih,0)]]
-        .map(([l,v]) => <div key={l as string} className="min-w-0 rounded-xl border border-slate-200 bg-white p-3"><p className="truncate text-xs text-slate-500">{l}</p><p className="break-words font-extrabold tabular-nums">{rp(v as number)}</p></div>)}</section>
+        .map(([l,v]) => <div key={l as string} className="min-w-0 rounded-xl p-3 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl"><p className="truncate text-xs text-slate-500">{l}</p><p className="break-words font-extrabold tabular-nums">{rp(v as number)}</p></div>)}</section>
     {res.reconDiff!==null && res.reconDiff!==0 && <p className="text-sm text-red-700" role="status">Selisih dengan total struk: {rp(res.reconDiff)}.</p>}
 
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
@@ -109,15 +109,15 @@ export default function Detail() {
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"><input className={inp} inputMode="numeric" placeholder="Nominal dibayar" value={amt} onChange={e=>setAmt(e.target.value)}/>
               <input className={inp} placeholder="Catatan (opsional)" value={note} onChange={e=>setNote(e.target.value)}/></div>
             <div className="flex flex-wrap gap-2">
-              <button disabled={busy} onClick={addPay} className="min-h-12 flex-1 whitespace-nowrap rounded-xl bg-brand px-4 py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">Catat pembayaran</button>
+              <button disabled={busy} onClick={addPay} className="min-h-12 flex-1 whitespace-nowrap rounded-xl bg-brand/90 backdrop-blur-md px-4 py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">Catat pembayaran</button>
               {cur && cur.sisa>0 && <button onClick={()=>setAmt(String(cur.sisa))} className="min-h-12 rounded-xl border border-brand px-4 py-3 font-bold text-brand hover:bg-brand/5">Isi sisa {rp(cur.sisa)}</button>}</div>
             {err && <p role="alert" className="text-sm text-red-700">{err}</p>}</div>
           {d.py.length===0 ? <p className="text-sm text-slate-500">Belum ada pembayaran tercatat.</p>
-            : <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+            : <ul className="divide-y divide-slate-200/60 overflow-hidden rounded-xl border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl">
               {d.py.map((p:any) => <li key={p.id} className="flex items-center justify-between gap-3 p-3 text-sm">
                 <div className="min-w-0"><p className="truncate font-semibold">{name(p.participant_id)}</p><p className="break-words text-slate-500">{wib(p.paid_at)}{p.note?` · ${p.note}`:''}</p></div>
                 <div className="flex shrink-0 items-center gap-1"><span className="font-bold tabular-nums">{rp(Number(p.amount))}</span>
-                  <button aria-label="Hapus pembayaran" onClick={()=>delPay(p.id)} className="grid h-11 w-11 place-items-center rounded-lg text-slate-500 hover:bg-slate-100">×</button></div></li>)}</ul>}</section>
+                  <button aria-label="Hapus pembayaran" onClick={()=>delPay(p.id)} className="grid h-11 w-11 place-items-center rounded-lg text-slate-500 hover:bg-white/60">×</button></div></li>)}</ul>}</section>
 
         <div className="space-y-2 border-t border-slate-200 pt-5">
           <button onClick={removeTx} disabled={deleting} className="min-h-12 w-full rounded-xl border border-red-300 px-5 py-3 font-bold text-red-700 hover:bg-red-50 disabled:opacity-60">{deleting ? 'Menghapus…' : 'Hapus transaksi'}</button>

@@ -6,9 +6,9 @@ import {supabase} from '../lib/supabase'
 type Props = {onSignOut: () => void}
 type Notice = {kind:'ok'|'err'; text:string} | null
 
-const ACCENT = 'bg-[#466d6a] hover:bg-[#385856]'
-const inp = 'min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base'   // text-base (16px) mencegah auto-zoom di HP
-const card = 'space-y-3 rounded-xl border border-slate-200 bg-white p-4 sm:p-5'
+const ACCENT = 'bg-[#466d6a]/90 hover:bg-[#3a5b58] backdrop-blur-md'
+const inp = 'min-h-11 w-full min-w-0 rounded-lg px-3 py-2 text-base border border-white/80 bg-white/70 ring-1 ring-slate-300/50 backdrop-blur-md focus:bg-white/95'   // text-base (16px) mencegah auto-zoom di HP
+const card = 'space-y-3 rounded-xl p-4 border border-white/70 bg-white/65 shadow-[0_8px_30px_rgb(15,23,42,0.04)] backdrop-blur-xl sm:p-5'
 const primaryBtn = `min-h-11 w-full rounded-xl px-5 py-2.5 font-bold text-white disabled:opacity-60 sm:w-auto ${ACCENT}`
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 

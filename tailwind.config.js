@@ -1,1 +1,1 @@
-export default {content:['./index.html','./src/**/*.{ts,tsx}'],theme:{extend:{fontFamily:{sans:['"Plus Jakarta Sans"','system-ui','sans-serif']},colors:{ink:'#16202b',paper:'#f3f6f5',brand:{DEFAULT:'#0f766e',dark:'#0b5a54'}}}}}
+export default {content:['./index.html','./src/**/*.{ts,tsx}'],theme:{extend:{fontFamily:{sans:['"Plus Jakarta Sans"','system-ui','sans-serif']},colors:{ink:'#16202b',paper:'#f3f6f5',brand:{DEFAULT:'#466d6a',dark:'#3a5b58'}}}}}
